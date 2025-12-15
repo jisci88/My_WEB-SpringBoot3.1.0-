@@ -2,7 +2,7 @@ DB로 저장할 때 여러 방법이 있지만, 기본적인 H2 DB와 Repository
 
 
 
-앞서 봤던 DTO 데이터가 DB로 저장되기 위해 JPA(Java Persistence API)를 사용할 수 있다. JPA는 자바 언어로 DB에 명령을 내리는 도구로, 데이터를 객체 지향적으로 관리할 수 있게 해준다. 즉, 클라이언트 데이터 -> DTO -> 서버 -> JAP -> DB(SQL) 관리 인 셈이다.
+앞서 봤던 DTO 데이터가 DB로 저장되기 위해 JPA(Java Persistence API)를 사용할 수 있다. JPA는 자바 언어로 DB에 명령을 내리는 도구로, 데이터를 객체 지향적으로 관리할 수 있게 해준다. 즉, 클라이언트 데이터 -> DTO -> 서버(Controller, ...) -> Entity -> (JAP) -> DB(SQL) 관리 인 셈이다.
 
 DTO가 최종적으로 DB로 저장되기 위해서는 몇가지 과정을 거쳐야 한다. 그 과정은 DTO -> Entity -> Repository 인터페이스 -> DB 작성.
 Entity: DB에 저장될 실질적인 행렬 형태의 데이터이다. 자바 객체를 DB가 이해할 수 있도록 만든 것으로, 이를 기반으로 테이블이 만들어진다.
