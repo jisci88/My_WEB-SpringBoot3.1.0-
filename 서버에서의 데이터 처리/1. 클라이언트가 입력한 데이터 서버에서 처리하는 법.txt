@@ -1,0 +1,63 @@
+클라이언트가 웹사이트에서 폼 형식 데이터(ex: 글 작성)를 작성하고 제출(submit)했을 때 해당 데이터가 어떻게 처리되는지 살펴보겠다.
+
+크게 보면 클라이언트가 작성한 정보가 서버로 이동하는 과정은 다음과 같다.
+클라이언트가 작성한 데이터 -> DTO(Data Transfer Object) 형태로 전달 -> Controller에서 해당 데이터 처리
+
+
+1. 폼을 제출할 수 있는 페이지를 제작한다. 예를 들면 mustache파일로 다음과 같이 간단하게 작성한다. (bootstrap css, js 필요)
+ [new.mustache]
+<form class="container" action="/makeNew" method="post">
+    <label>
+        Input:
+        <input type="text" name="title">
+    </label>
+
+    <label>
+        content
+        <textarea cols="3" name="content"></textarea>
+    </label>
+    <button type="submit" class="btn btn-primary">Enter</button>
+</form>
+
+
+2. 작성한 데이터가 어떤 구조로 전달될 것인지 DTO 코드를 작성한다. 클라이언트가 작성한 정보가 DTO(자바 클래스 구조)로 변환되어 서버에서 처리될 수 있도록 하는 것이다. 일반적인 자바 클래스 구조이다. 이때, 클래스 내부 변수 필드명과 1번에서 살펴본 html 태그의 name 속성값과 동일해야 자동으로 매칭된다. 예시 DTO 코드를 보자면 다음과 같다.
+ [ArticleForm.java]
+package com.example.firstproject.dto;
+
+public class ArticleForm {
+    private String title;
+    private String content;
+
+    public ArticleForm(Long id, String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+}
+보다시피 1번에서 title, content가 그대로 연결돼 있다. 해당 값이 해당 변수명으로 그대로 대입된다. 즉, 클라이언트가 작성한 데이터는 DTO라는 형태로 전달되며, 그 형태는 자바 클래스 객체인 것이다.
+
+
+3. 데이터는 보통 Controller에서 처리한다. 예시 코드를 보자면
+ [ArticleController.java]
+package com.example.firstproject.controller;
+
+import com.example.firstproject.dto.ArticleForm;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+
+@Controller
+public class ArticleController {
+
+    @GetMapping("/new")
+    public String page1() {
+        return "new";
+    }
+
+    @PostMapping("/makeNew")
+    public String test(ArticleForm art) {
+        System.out.println(art.toString());
+        return "";
+    }
+}
+
+localhost:8080/new 사이트에 접속해 title에 abc, content에 123을 입력하고 제출하면 Article{title='abc', content='123'}와 같이 뜨는 것을 볼 수 있다. 클라이언트가 입력한 데이터가 정상적으로 서버로 전송된 것이다.
