@@ -1,0 +1,29 @@
+이전 내용에서는 Repository를 활용해 DB에 저장하는 법을 살펴봤다. 이번에는 H2 DB를 연동하고 SQL까지 사용해보겠다.
+
+우선 src/main/java/resources에 application.properties파일에 
+
+`spring.h2.console.enabled=true`
+
+를 추가해야 H2 DB를 사용할수가 있다.
+
+이제 서버를 실행하고 [localhost:8080/h2-console](http://localhost:8080/h2-consoledmf) 로 들어가면 H2 DB 설정 페이지가 나온다. 우리는 여기서 [JDBC URL](http://localhost:8080/h2-console/login.jsp?jsessionid=d92cb3d07ee490d620ab567dd364907d#): 항목값을 매 서버 실행마다 바꿔줘야 하는데, DB 내용을 저장할 컴퓨터상의 메모리 주소이다. intellij에서 run창을 보면
+
+```jsx
+2025-12-16T18:15:59.859+09:00  INFO 12412 --- [           main] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:f8be6fd3-47db-41b0-ab15-ff1b1f7b6168'
+```
+
+이런 메시지를 볼 수 있는데(Ctrl+F으로 jdbc를 검색하면 쉽게 찾을 수 있다), 우리가 필요한 주소가 바로 jdbc:h2:mem:f8be6fd3-47db-41b0-ab15-ff1b1f7b6168이다. 이 값 전체를 매 서버 재실행마다 찾아서  [JDBC URL](http://localhost:8080/h2-console/login.jsp?jsessionid=d92cb3d07ee490d620ab567dd364907d#):에 입력하고 하단의 connect를 눌러주면 된다.
+
+전 페이지에서 살펴봤듯 SQL을 통해 CRUD기능을 사용할 수 있다. 다만 Create는 INSERT, Read는 SELECT, Update는 UPDATE, Delete는 DELETE로 대응된다. SQL 문법은 대소문자를 구분하지 않으나 알아보기 쉽게 하기 위해 SQL 문법은 대문자로 하며 나머지 요소들은 소문자로 하는게 좋다. 바로 예시를 살펴보자.
+
+전체 테이블의 요소들을 보고싶으면
+
+SELECT * FROM article;
+
+과 같이 하면 된다. *는 모든 것 이라는 의미이며, FROM 뒤에 대상이 나온다. 참고로 DB 이름(여기서는 article)은 Entity로 만들었던 자바 클래스 파일 이름이 된다. @Entity와 함께 @Table(name=”article”) 같은 어노테이션으로 직접 이름 지정도 가능하다고 한다. 이번에는 데이터를 삽입해보겠다.
+
+INSERT INTO 대상(속성1, 속성2, 속성3, …) VALUES(값1, 값2, 값3, …);
+
+INSERT INTO article(id, content, title) VALUES(1, ‘hi’, ‘A’);
+
+이렇게 하면 속성n 컬럼에 값n 값이 서로 매칭돼 하나의 레코드(행)가 생성된다. 중요한 점은 값을 적을 때 문자열 리터럴은 ‘’로 감싸야 한다. “”는 식별자를 표현하기 위해 감싸는 용도라 “”로 하면 문법 오류가 발생할 수 있다. 한 세트의 속성과 값을 생략하면 해당 값에는 null로 자동 채워진다.
