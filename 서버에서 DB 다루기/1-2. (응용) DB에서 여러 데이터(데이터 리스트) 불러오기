@@ -1,0 +1,43 @@
+1번의 내용과 바로 연결된다. 이번에는 DB에서 여러개의 데이터를 한 번에 불러올 것이다. 게시판에서 현재까지 작성된 모든 게시글을 보겠다는 목표로 생각해보자.
+
+```java
+	    [ArticleController.java]
+	    
+    @GetMapping("/articles")
+    public String index(Model model) {
+        Iterable<ArticleEntity> articleList = artRepo.findAll();
+        model.addAttribute("articles", articleList);
+        return "index";
+    }
+```
+
+위와 같이 코드를 작성해준다. 클라이언트가 …/articles 페이지에 접속하면 현재까지 작성된 모든 글이 보일 것이다.  DB에서 모든 데이터를 가져오려면 CrudRepository의 findAll 메서드가 이를 지원한다. 반환값은 Iterable<T> 이다. 이 객체로 그대로 model에 저장해준다. 다음은 mustache파일을 보겠다.
+
+```html
+{{>layouts/header}}
+
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Title</th>
+        <th scope="col">Content</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#articles}}
+        <tr>
+            <th>{{id}}</th>
+            <td>{{title}}</td>
+            <td>{{content}}</td>
+        </tr>
+    {{/articles}}
+    </tbody>
+</table>
+
+{{>layouts/footer}}
+```
+
+새로 만든 index.mustache인데, show.mustache랑 달라진 곳은 변수명밖에 없다. Entity 객체가 반복 가능한 경우(리스트 형태이거나 지금처럼 Iterable<> 같은 형태) 해당 개수만큼 {{#articles}} ~ {{/articles}} 사이 요소가 반복된다. 총 3개의 데이터가 쌓여있으면 저 코드는 3번 반복되고 각 레코드 데이터에 대응되게 된다.
+
+(참고) 우리가 사용하는 artRepo는 최소기능만을 구현한 CrudRepository를 상속받은 것이며, findAll의 반환값은 Iterable<T>이다. CrudRepository를 간접적으로 상속받고 있으며 더 기능을 추가한 JpaRepository를 상속받을 경우 findAll의 반환값은 List<T>가 된다. 이름에서 알다시피 JpaRepository가 더 많은 기능을 지원해 List<T>로 반환하게 설계된 듯 싶다.
