@@ -1,0 +1,17 @@
+리다이렉트는 클라이언트가 보낸 요청을 처리하고 계속해서 처리할 다음 요청 주소를 재지시하는 것이다. 예를 들어, 특정 요청을 처리하기 위해 A 부서로 보낸 다음 B 부서, 그리고 C 부서로 보내는 것처럼 말이다. new 페이지에서 새 게시글을 작성한 다음 방금 작성한 게시글을 보여주는 show 페이지로 리다이렉트 해보겠다.
+
+```java
+	 [ArticleController.java]
+	 ...   
+    @PostMapping("/makeNew")
+    public String test(ArticleForm art) {
+        ArticleEntity a1 = art.toEntity();
+
+        ArticleEntity s1 = artRepo.save(a1);
+
+        return "redirect:/articles/"+s1.getId();
+    }
+    ...
+```
+
+위의 코드에서 리다이렉트 부분이 return … 문이다. 보통은 보여줄 mustache 파일 이름만 작성했는데 리다이렉트로 새로운 링크로 안내할 경우 redirect:(이동할 경로) 형식으로 작성하면 된다.
